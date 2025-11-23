@@ -1,0 +1,53 @@
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Productor {
+  id_productor   Int       @id @default(autoincrement())
+  nombres        String
+  apellidos      String
+  direccion      String
+  fecha_registro DateTime  @default(now())
+  dni            String    @unique
+  lotes          Lote[]
+}
+
+model Lote {
+  id_lote          Int              @id @default(autoincrement())
+  id_productor     Int
+  fecha_recepcion  DateTime         @default(now())
+  peso_kg          Float
+  tipo_cafe        String
+  estado_lote      String           @default("PENDIENTE")
+  observaciones    String?
+  productor        Productor        @relation(fields: [id_productor], references: [id_productor])
+  control_calidad  ControlCalidad[]
+  compra           Compra?
+}
+
+model ControlCalidad {
+  id_control     Int       @id @default(autoincrement())
+  id_lote        Int
+  humedad        Float
+  defectos       Int
+  taza           String
+  resultado      String
+  aprobado       Boolean
+  fecha_control  DateTime  @default(now())
+  lote           Lote      @relation(fields: [id_lote], references: [id_lote])
+}
+
+model Compra {
+  id_compra      Int       @id @default(autoincrement())
+  id_lote        Int       @unique
+  precio_x_kg    Float
+  monto_total    Float
+  metodo_pago    String
+  fecha_pago     DateTime  @default(now())
+  estado_pago    String    @default("PENDIENTE")
+  lote           Lote      @relation(fields: [id_lote], references: [id_lote])
+}
